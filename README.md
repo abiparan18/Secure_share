@@ -54,17 +54,6 @@ REACT_APP_PINATA_API_KEY=your_key
 REACT_APP_PINATA_SECRET_KEY=your_secret
 REACT_APP_CONTRACT_ADDRESS=deployed_contract_address
 
-Secure_share/
-├── contracts/
-│   └── Upload.sol
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   └── App.js
-│   └── public/
-├── scripts/
-│   └── deploy.js
-└── README.md
 
 Made with ❤️ by Abishathan & Aathipan
 
