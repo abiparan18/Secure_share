@@ -7,6 +7,8 @@
 
 Secure Share is a **decentralized file sharing DApp** built on **Ethereum** and **IPFS**, allowing users to securely upload, store, and retrieve files with full ownership and privacy — no central servers, no compromises.
 
+- **Friend’s Name** – Project Partner  
+  https://github.com/AatHi
 ---
 
 
