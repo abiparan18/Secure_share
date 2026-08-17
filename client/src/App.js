@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Upload from "./artifacts/contracts/Upload.sol/Upload.json";
 import FileUpload from "./components/FileUpload";
@@ -14,35 +14,39 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-
     const loadProvider = async () => {
-      if (provider) {
-        window.ethereum.on("accountsChanged", async () => {
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-          setAccount(address);
-        });
-
-        window.ethereum.on("chainChanged", () => {
-          window.location.reload();
-        });
-
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        setAccount(address);
-
-        const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; 
-        const contract = new ethers.Contract(contractAddress, Upload.abi, signer);
-        setContract(contract);
-        setProvider(provider);
-      } else {
-        alert("Install MetaMask");
+      if (!window.ethereum) {
+        alert("Install MetaMask to use Secure Share");
+        return;
       }
+
+      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+      if (!contractAddress) {
+        alert("Contract address is not configured. See README.md.");
+        return;
+      }
+
+      const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      const updateAccount = async () => {
+        const signer = web3Provider.getSigner();
+        setAccount(await signer.getAddress());
+      };
+
+      window.ethereum.on("accountsChanged", updateAccount);
+      window.ethereum.on("chainChanged", () => window.location.reload());
+
+      await web3Provider.send("eth_requestAccounts", []);
+      const signer = web3Provider.getSigner();
+      setAccount(await signer.getAddress());
+      setContract(new ethers.Contract(contractAddress, Upload.abi, signer));
+      setProvider(web3Provider);
     };
 
-    loadProvider();
+    loadProvider().catch((error) => {
+      console.error("Unable to initialize Web3 provider", error);
+      alert("Unable to connect to MetaMask");
+    });
   }, []);
 
   return (
@@ -72,7 +76,7 @@ function App() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        Account: {account ? account : "Not connected"}
+        Account: {account || "Not connected"}
       </motion.div>
 
       <FileUpload account={account} provider={provider} contract={contract} />
